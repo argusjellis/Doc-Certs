@@ -11,7 +11,7 @@ Then:<br>
 `virtualenv path/to/this/repo`<br>
 `cd path/to/this/repo`<br>
 `source bin/activate`<br>
-`pip install -r requirements.txt`
+`sudo pip install -r requirements.txt`
 
 ### Run the script
 `python scraper.py`
