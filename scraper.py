@@ -25,6 +25,11 @@ import time
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 
 
 ############################
@@ -32,7 +37,7 @@ from selenium.webdriver.common.keys import Keys
 ############################
 
 ALPHABET = "abcdefghijklmnopqrstuvwxyz"
-BASE_URL = "http://www.certificationmatters.org"
+BASE_URL = "https://www.certificationmatters.org/is-your-doctor-board-certified/search-now.aspx"
 LOGIN_USER = os.environ['CERT_SITE_USER']
 LOGIN_PW = os.environ['CERT_SITE_PW']
 
@@ -48,11 +53,43 @@ driver = webdriver.Firefox()
 driver.get(BASE_URL)
 
 # make sure it's the page we want
-assert "Certification" in driver.title
+assert "Search Now" in driver.title
 
-# ====
-# this is where do all the scraping
-# ====
+# to trigger the login page, do a fake search
+# first, target the "last name" text input
+# ... but wait until the element is present on the page
+
+lname_form = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.ID, "dnn_ctr865_Search_txtlastName"))
+)
+
+# send the letter 'a'
+lname_form.send_keys("a")
+
+# click the 'search' button
+driver.find_element_by_id("dnn_ctr865_Search_search").click()
+
+# target the email input, once it's visible
+email_input = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.ID, "dnn_ctr865_Search_txtEmailAddress"))
+)
+
+# target the password input, once it's visible
+pw_input = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.ID, "dnn_ctr865_Search_txtPassword"))
+)
+
+# send email and pw
+email_input.send_keys(LOGIN_USER)
+pw_input.send_keys(LOGIN_PW)
+
+# submit
+driver.find_element_by_id("dnn_ctr865_Search_btnLogin").click()
+
+
+"""
+select = Select(driver.find_element_by_name('name'))
+"""
 
 # shut it down
 driver.close()
